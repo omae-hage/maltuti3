@@ -60,6 +60,10 @@ int WINAPI WinMain(_In_HINSTANCE hInstance, _In_opt_HINSTANCE hPrevInstance, _in
 	
 	//ウィンドウモードで起動
 	ChangeWindowMode(TRUE);
+
+	//画面サイズの最大サイズ、カラービット数を設定
+
+	SetGraphMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_COLORBIT);
 }
 
 
