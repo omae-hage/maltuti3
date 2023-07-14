@@ -22,7 +22,7 @@
 
 #define SCREEN_COLORBIT  (32)   //スクリーンカラービット
 
-#define SCREEN　FONT_SIZE  (20)   //文字サイズ
+#define FONT_SIZE  (20)   //文字サイズ
 
 /**********************************
 
@@ -73,18 +73,18 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	}
 
 	//各機能の初期化処理
-	FreamCotrol_Initialize();     //フレームレート制御機能
+	FreamControl_Initialize();     //フレームレート制御機能
 	Input_Initialize();           //入力制御機能
 
 	//シーンマネージャー初期化処理
 	//エラーが発生したら、終了する
 	if (SceneManager_Initialize(E_TITLE) == D_ERROR)
 	{
-		retun D_ERROR;
+		return D_ERROR;
 	}
 
 	//描画先画面を裏にする
-	SerDrawScreen(DX_SCREEN_BACK);
+	SetDrawScreen(DX_SCREEN_BACK);
 
 	//文字サイズを設定する
 	SetFontSize(FONT_SIZE);
@@ -115,7 +115,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	//Dxライブラリ利用の終了処理
 	DxLib_End();
 
-	retum 0;
+	return 0;
 
 }
 

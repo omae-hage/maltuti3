@@ -137,6 +137,7 @@
     <ClInclude Include="FreamControl.h" />
     <ClInclude Include="InputControl.h" />
     <ClInclude Include="SceneManager.h" />
+    <ClInclude Include="Stage.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
