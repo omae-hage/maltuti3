@@ -133,9 +133,14 @@
   <ItemGroup>
     <ClCompile Include="AppMain.cpp" />
     <ClCompile Include="FreamControl.cpp" />
+    <ClCompile Include="GameClearScene.cpp" />
+    <ClCompile Include="GameMainScene,cpp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FreamControl.h" />
+    <ClInclude Include="GameClearScene.h" />
+    <ClInclude Include="GameMainScene.h" />
+    <ClInclude Include="GameOverScene.h" />
     <ClInclude Include="InputControl.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Stage.h" />

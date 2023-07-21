@@ -63,6 +63,18 @@ void DreamControl_Initialize(void)
 
 **************************/
 
+void FreamControl_Update(void)
+{
+	NowTime = GetNowCount();
+	Wait = FreamTime - (NowTime - LastTime);
+
+	if (Wait > 0)
+	{
+		WaitTimer(Wait);
+	}
+	LastTime = GetNowCount();
+}
+
 
 
 
