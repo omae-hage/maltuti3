@@ -79,10 +79,93 @@ int GameMinScene_Initialize(void)
 	//ゲームプレイが初回かどうか？
 	if (GameCount == 0)
 	{
-		GameScore = 0;
+		GameScore = 0;     //スコアの初期化
 		
-		GameLevel = 1;
+		GameLevel = 1;    //ゲームレベルの初期化
+
+		set_StageMission(3);   //ミッションの初期化
+
+		GameCount++;          //次回のせってい
 
 
 	}
+	else
+	{
+		GameLevel++;            //ゲームレベルの更新
+
+		Set_StageMission(3);    //ミッションを増やす
+	}
+	GameTime = TIMELIMIT;    //正義円時間の初期化
+
+	return ret;
 }
+
+
+
+/********************
+
+*ゲームメイン画面：更新処理
+
+*引数　：　なし
+
+*戻り値　：　なし
+
+*****************/
+
+void GameMainScene_Update(void)
+{
+	switch (Get_StageState())
+	{
+
+	case 0:
+		SelectBlock();  //ブロックを選択する
+		break;
+
+	case 2:
+		MoveBlock();    //ブロックを移動させる
+		break;
+
+	case 3:
+		CheckBlock();   //ブロックの確認
+
+	case 4:
+		CheckClear();   //クリアチェック
+		break;
+
+	default:
+		break;
+	}
+
+	//制限時間の更新
+	GameTime--;
+
+	//制限時間がなくなったら、ゲームオーバーに遷移する
+	if (GameTime < 0)
+	{
+		change_scene(E_GAME_OVER);
+
+	}
+	//ミッションを達成したら、ゲームクリアに遷移する
+	if (Get_StageClearFlag())
+	{
+		change_scene(E_GAME_CLEAR);
+	}
+}
+
+/********************
+
+*げーmジュメイン関数　：　描画処理
+ 
+* 引数　：　なし
+
+* 戻り値　：　なし
+
+*****************/
+
+void GameMainScene_Draw(void)
+{
+	int PosX = 600;
+	int tmp_levle = GameLevel;
+	int tmp_score = Get_StageSoore();
+}
+
