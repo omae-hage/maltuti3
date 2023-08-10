@@ -1,5 +1,6 @@
 #include"GameMainScene.h"
 #include "DxLib.h"
+#include "Stage.h"
 #include "SceneManager.h"
 
 /********************
@@ -83,7 +84,7 @@ int GameMinScene_Initialize(void)
 		
 		GameLevel = 1;    //ゲームレベルの初期化
 
-		set_StageMission(3);   //ミッションの初期化
+		Set_StageMission(3);   //ミッションの初期化
 
 		GameCount++;          //次回のせってい
 
@@ -142,13 +143,13 @@ void GameMainScene_Update(void)
 	//制限時間がなくなったら、ゲームオーバーに遷移する
 	if (GameTime < 0)
 	{
-		change_scene(E_GAME_OVER);
+		Change_Scene(E_GAME_OVER);
 
 	}
 	//ミッションを達成したら、ゲームクリアに遷移する
 	if (Get_StageClearFlag())
 	{
-		change_scene(E_GAME_CLEAR);
+		Change_Scene(E_GAME_CLEAR);
 	}
 }
 
@@ -166,6 +167,38 @@ void GameMainScene_Draw(void)
 {
 	int PosX = 600;
 	int tmp_levle = GameLevel;
-	int tmp_score = Get_StageSoore();
+	int tmp_score = Get_StageScore();
+
+	//ステージを描画
+	StageDraw();
+
+	//フェードアウト状態か？
+	if (Get_StageState() == 1)
+	{
+		FadeOutBlock();   //フェードアウトする。
+	}
+	//レベルを描画
+	do
+	{
+		DrawRotaGraph(PosX, 80, 0.5f, 0, NumberImage[tmp_levle % 10], TRUE);
+		tmp_levle /= 10;
+		PosX -= 30;
+	} 
+	while (tmp_levle > 0);
+
+	//スコアの描画
+	PosX = 620;
+	do
+	{
+		DrawRotaGraph(PosX, 160, 0.3f, 0, NumberImage[tmp_score % 10], TRUE);
+		
+		tmp_score /= 10;
+		PosX -= 20;
+	}
+	while (tmp_score > 0);
+
+	//制限時間の描画
+	DrawBox(491, 469, 509, 469 - GameTime / 60 * 2,0x0033ff, TRUE);
+
 }
 
