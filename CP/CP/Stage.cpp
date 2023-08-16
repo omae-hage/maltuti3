@@ -9,9 +9,9 @@
 **********************/
 
 #define HEIGHT            (12)    //ブロック配置サイズ（高さ）
-#define WIDTH             (12)　　//ブロック配置サイズ（幅）
-#define BLOCKSIZE         (48)　　//ブロックサイズ
-#define BLOCK_IMAGE_MAX   (10)　　//ブロックが増数
+#define WIDTH             (12)	//ブロック配置サイズ（幅）
+#define BLOCKSIZE         (48)	//ブロックサイズ
+#define BLOCK_IMAGE_MAX   (10)	//ブロックが増数
 
 #define ITEM_MAX           (8)    //アイテム最大数
 
@@ -34,6 +34,12 @@ typedef struct
 	int  backup;
 }T_Object;
 
+typedef struct
+{
+	int x;
+	int y;
+}T_CURSOR;
+
 enum
 {
 	E_NONE,
@@ -50,4 +56,27 @@ enum
 T_Object Block[HEIGHT][WIDTH];
 T_CURSOR Select[3];
 int Item[ITEM_MAX];
-int 
+int ClickStatus;
+int Stage_State;
+int Stage_Mission;
+int Stage_Score;
+int ClearFlag;
+
+int BlockImage[BLOCK_IMAGE_MAX];  
+int StageImage;		
+
+int ClickSE;		//クリックSE
+int FadeOutSE;      //フェードアウトSE
+int MoveBlockSE;    //ブロック移動SE
+
+/************************
+
+*プロトタイプ宣言
+
+**************************/
+
+int combo_check(int x, int y);
+void combe_check_h(int y, int x, int* cnt,int* col);
+void combe_check_w(int y, int x, int* cnt,col);
+void save_block(void);
+void restore_block(void);
