@@ -77,6 +77,40 @@ int MoveBlockSE;    //ブロック移動SE
 
 int combo_check(int x, int y);
 void combe_check_h(int y, int x, int* cnt,int* col);
-void combe_check_w(int y, int x, int* cnt,col);
+void combe_check_w(int y, int x, int* cnt,int* col);
 void save_block(void);
 void restore_block(void);
+
+/************************
+
+*シーン管理機能:
+
+* 引数；変更するゲームモード
+
+* 戻り値：なし
+
+**************************/
+
+int StageIninialize(void)
+{
+	int ret = 0;
+	int i;
+
+
+	//画像読み込み
+	LoadDivGraph("images/block.png", BLOCK_IMAGE_MAX, BLOCK_IMAGE_MAX, 1, BLOCKSIZE, BLOCKSIZE, BlockImage);
+	StageImage = LoadGraph("images/stage.png");
+
+	//音源読み取り
+	ClickSE = LoadSoundMem("sounds/click_se.mp3");
+
+	FadeOutSE = LoadSoundMem("sounds/fadeout_se.mp3")
+
+	MoveBlockSE = LoadSoundMem("sounds/moveblock_se.mp3")
+}
+
+
+
+
+
+
