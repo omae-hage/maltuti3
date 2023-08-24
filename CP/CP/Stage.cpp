@@ -200,11 +200,88 @@ void StageDraw(void)
 
 	//アイテムの取得個数を描画
 	for (int i = 0; i < ITEM_MAX; i++)
-	{ 
+	{
 		DrawRotaGraph(540, 245 + i * 30, 0.5f, 0, BlockImage[i + 1], TRUE, 0);
-		DrawFormatString(580, 235 +i * 30, GetColor(255, 255, 255),"%3d",Item[i]);
+		DrawFormatString(580, 235 + i * 30, GetColor(255, 255, 255), "%3d", Item[i]);
 	}
 }
+
+/************************
+
+*シーン制御機能:ステージの描画
+
+* 引数；変更するゲームモード
+
+* 戻り値：なし
+
+**************************/
+
+
+
+void CreateBlock(void)
+{
+	int Check = 0;
+	int i, j;
+
+	do
+	{
+		Check = 0;
+		for (i = 0; i < HEIGHT; i++)
+		{
+			for (j = 0; j < WIDTH; j++)
+			{
+				if (j == 0 || i == HEIGHT - 1 || i == 0)
+				{
+					Block[i][j].flg = FALSE;
+					Block[i][j].image = NULL;
+				}
+				else
+				{
+					Block[i][j].flg = TRUE;
+					Block[i][j].x = (j - 1) * BLOCKSIZE;
+					Block[i][j].y = (i - 1) * BLOCKSIZE;
+					Block[i][j].width = BLOCKSIZE;
+					Block[i][j].height = BLOCKSIZE;
+					Block[i][j].image = GetRand(7) + 1;//1~８の乱数
+
+				}
+			}
+		}
+		/*for(i= 1;i<HEIGHT-1;i++)
+		{
+		for(j = i;j<WIDTH-1;j++)
+		{
+		if (Block[i][j].image == NULL)
+		{
+		Block[i][j].image = GetRand(7)+1;
+		}
+		}
+
+		}*/
+		//ブロック連鎖チェック
+		for (i = 1; i < HEIGHT - 1; i++)
+		{
+			for (j = 1; j < WIDTH - 1; j++)
+			{
+				Check += combo_check(i, j);
+			}
+		}
+	} while (Check != 0);
+	for (i = 0; i < +ITEM_MAX; i++)
+	{
+		Item[i] = 0;
+	}
+}
+
+/************************
+
+*シーン制御機能:ぶろっく選択処理
+
+* 引数；なし
+
+* 戻り値：なし
+
+**************************/
 
 
 
