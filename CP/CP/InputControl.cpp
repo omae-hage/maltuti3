@@ -49,7 +49,8 @@ void Input_Initialize(void)
 void Input_Update(void)
 {
 	//マウス入力情報の取得
-	old_button = GetMouseInput();
+	old_button = now_button;
+	now_button = GetMouseInput();
 
 	//マウスカーソル座標の取得
 	GetMousePoint(&mouse_position_x, &mouse_position_y);
@@ -88,7 +89,7 @@ int Input_Escape(void)
 
 **********************/
 
-int GetOldKye(int key)
+int GetOldKey(int key)
 {
 	int ret = FALSE;
 
@@ -130,7 +131,7 @@ int GetNowKey(int key)
 
 **********************/
 
-int GetKyeFlg(int key)
+int GetKeyFlg(int key)
 {
 	int ret = FALSE;
 	int keyflg = now_button & ~old_button;
@@ -168,7 +169,7 @@ int GetMousePositionX(void)
 
 **********************/
 
-int GerMousePositionY(void)
+int GetMousePositionY(void)
 {
 	return mouse_position_y;
 }

@@ -76,8 +76,8 @@ int MoveBlockSE;    //ブロック移動SE
 **************************/
 
 int combo_check(int x, int y);
-void combe_check_h(int y, int x, int* cnt,int* col);
-void combe_check_w(int y, int x, int* cnt,int* col);
+void combo_check_h(int y, int x, int* cnt,int* col);
+void combo_check_w(int y, int x, int* cnt,int* col);
 void save_block(void);
 void restore_block(void);
 
@@ -91,7 +91,7 @@ void restore_block(void);
 
 **************************/
 
-int StageIninialize(void)
+int StageInitialize(void)
 {
 	int ret = 0;
 	int i;
@@ -197,13 +197,6 @@ void StageDraw(void)
 	SetFontSize(20);
 	DrawFormatString(590, 211, GetColor(255, 255, 255), "%3d", Stage_Mission);
 
-
-	//アイテムの取得個数を描画
-	for (int i = 0; i < ITEM_MAX; i++)
-	{
-		DrawRotaGraph(540, 245 + i * 30, 0.5f, 0, BlockImage[i + 1], TRUE, 0);
-		DrawFormatString(580, 235 + i * 30, GetColor(255, 255, 255), "%3d", Item[i]);
-	}
 }
 
 /************************
@@ -230,7 +223,7 @@ void CreateBlock(void)
 		{
 			for (j = 0; j < WIDTH; j++)
 			{
-				if (j == 0 || i == HEIGHT - 1 || i == 0)
+				if (j == 0 || j == HEIGHT - 1 || i == HEIGHT - 1|| i== 0)
 				{
 					Block[i][j].flg = FALSE;
 					Block[i][j].image = NULL;
@@ -281,8 +274,8 @@ void CreateBlock(void)
 
 * 戻り値：なし
 
-**************************/
 
+**************************/
 void SelectBlock(void)
 {
 	int TmpBlock;
@@ -326,13 +319,13 @@ void SelectBlock(void)
 			ClickStatus = E_ONCE;
 		}
 		else if (ClickStatus == E_ONCE &&
-			((abs(Select[NEXT_CURSOR].x - Select[SELECT_CURSOR].x) == 1 &&
-			((abs(Select[NEXT_CURSOR].y - Select[SELECT_CURSOR].y) == 0)) ||
-			((abs(Select[NEXT_CURSOR].x - Select[SELECT_CURSOR].x) == 0 &&
-			abs(Select[NEXT_CURSOR].y - Select[SELECT_CURSOR].y) == 1)))))
+			((abs(Select[NEXT_CURSOR].x - Select[SELECT_CURSOR].x) == 1 )&&
+			(abs(Select[NEXT_CURSOR].y - Select[SELECT_CURSOR].y) == 0)) ||
+			(abs(Select[NEXT_CURSOR].x - Select[SELECT_CURSOR].x) == 0 &&
+			abs(Select[NEXT_CURSOR].y - Select[SELECT_CURSOR].y) == 1))
 		{
 			Select[TMP_CURSOR].x = Select[SELECT_CURSOR].x;
-				Select[TMP_CURSOR].y = Select[SELECT_CURSOR].y;
+			Select[TMP_CURSOR].y = Select[SELECT_CURSOR].y;
 			ClickStatus = E_SECOND;
 		}
 	}
@@ -341,15 +334,419 @@ void SelectBlock(void)
 	if (ClickStatus == E_SECOND)
 	{
 		TmpBlock = Block[Select[NEXT_CURSOR].y + 1][Select[NEXT_CURSOR].x + 1].image;
-		Block[Select[TMP_CURSOR].y + 1][Select[NEXT_CURSOR].x + 1].image = Block[Select[TMP_CURSOR].y + 1][Select[TMP_CURSOR].x + 1].image;
+		Block[Select[NEXT_CURSOR].y + 1][Select[NEXT_CURSOR].x + 1].image = Block[Select[TMP_CURSOR].y + 1][Select[TMP_CURSOR].x + 1].image;
 		Block[Select[TMP_CURSOR].y + 1][Select[TMP_CURSOR].x + 1].image = TmpBlock;
 
 	//連鎖が３つ以上か調べる	
 		Result = 0;
-		Result + combo_check(Select[NEXT_CURSOR].y + 1, Select[NEXT_CURSOR].x + 1);
+		Result += combo_check(Select[NEXT_CURSOR].y + 1, Select[NEXT_CURSOR].x + 1);
+		Result += combo_check(Select[TMP_CURSOR].y + 1, Select[TMP_CURSOR].x + 1);
+
+		//連鎖が３未満なら選択ブロックを元に戻す
+		if (Result == 0)
+		{
+			int TmpBlock = Block[Select[NEXT_CURSOR].y + 1][Select[NEXT_CURSOR].x + 1].image;
+			Block[Select[NEXT_CURSOR].y + 1][Select[NEXT_CURSOR].x + 1].image = Block[Select[TMP_CURSOR].y + 1][Select[TMP_CURSOR].x + 1].image;
+			Block[Select[TMP_CURSOR].y + 1][Select[TMP_CURSOR].x + 1].image = TmpBlock;
+
+		}
+		else
+		{
+			//連鎖が３つ以上ならブロックを消しブロック移動処理へ移動する
+			Stage_State = 1;
+		}
+		//次にクリックs＋できるようにClockFlfagを０にする
+		ClickStatus = E_NONE;
+	}    
+}
+/************************
+
+*ステージ制御機能；フェードアウト処理
+
+* 引数；なし
+
+* 戻り値：なし
+
+
+**************************/
+
+void FadeOutBlock(void)
+{
+	static int BlendMode = 255;
+	int i, j;
+
+	//フェードアウト効果音
+	if (CheckSoundMem(FadeOutSE) == 0)
+	{
+		PlaySoundMem(FadeOutSE, DX_PLAYTYPE_BACK);
+	}
+	//描画モードをアルファブレンドにする
+	SetDrawBlendMode(DX_BLENDGRAPHTYPE_ALPHA, BlendMode);
+	for (i = 1; i < HEIGHT - 1; i++)
+	{
+		for (j = 1; j < WIDTH - 1; j++)
+		{
+			if (Block[i][j].image == 0)
+			{
+				DrawGraph(Block[i][j].x, Block[i][j].y, BlockImage[Block[i][j].backup], TRUE);
+			}
+		}
+
+	}
+	//描画モードをノーブレンドにする
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+	BlendMode -= 5;
+
+	if (BlendMode == 0)
+	{
+		BlendMode = 255;
+		Stage_State = 2;
+		StopSoundMem(FadeOutSE);
+	}
+}
+/************************
+
+*ステージ制御機能；ブロック移動処理
+
+* 引数；なし
+
+* 戻り値：なし
+
+
+**************************/
+
+void MoveBlock(void)
+{
+	int i, j, k;
+	//ブロック移動効果音
+	PlaySoundMem(MoveBlockSE, DX_PLAYTYPE_BACK);
+
+	//　↓に移動する処理
+	for (i = 1; i < HEIGHT - 1; i++)
+	{
+		for (j = 1; j < WIDTH - 1; j++)
+		{
+			if (Block[i][j].image == 0)
+			{
+				for (k = i; k > 0; k--)
+				{
+					Block[k][j].image = Block[k - 1][j].image;
+					Block[k - 1][j].image = 0;
+				}
+			}
+		}
+	}
+	//からのブロックを生成する処理
+	for (i = 1; i < HEIGHT - 1; i++)
+	{
+		for (j = 1; j < WIDTH - 1; j++)
+		{
+			if (Block[i][j].image == 0)
+			{
+				Block[i][j].image = GetRand(7) + 1;
+			}
+		}
+	}
+	//連鎖チェックへ移行する
+	Stage_State = 3;
+}
+
+/************************
+
+*ステージ制御機能；連鎖チェック
+
+* 引数；なし
+
+* 戻り値：なし
+
+
+**************************/
+
+void CheckBlock(void)
+{
+	int Result = 0;
+	int i, j;
+
+	//ブロック連鎖チェック
+	for (i = 1; i < HEIGHT - 1; i++)
+	{
+		for (j = 1; j < WIDTH - 1; j++)
+		{
+			Result += combo_check(i, j);
+		}
+	}
+
+	//連鎖がなくなればブロック選択へ
+	//そうでなければブロック移動へ移行して連鎖チェックを継続する
+	if (Result == 0)
+	{
+		//クリアチェック処理移行する。
+		Stage_State = 4;
+	}
+	else
+	{
+		//連鎖が３つ以上ンらブロックを消してブロック移動処理へ移行する
+		Stage_State = 1;
+	}
+}
+/************************
+
+*シーン制御機能:クリア条件チェック処理
+
+* 引数；なし
+
+* 戻り値：なし
+
+*備考：クリア条件フラグを０とし、各スクールの消去ブロックがレベルよりも数が少なかったらチェック処理を中断してゲームを続行する・
+*
+
+**************************/
+
+void CheckClear(void)
+{
+	int i;
+	for (i = 0; i < ITEM_MAX; i++)
+	{
+		if (Item[i] >= Stage_Mission)
+		{
+			ClearFlag = TRUE;
+			break;
+		}
+	}
+	if (ClearFlag != TRUE)
+	{
+		Stage_State = 0;
 	}
 }
 
+/************************
+
+*シーン制御機能:ステージステータス情報取得処理
+
+* 引数；なし
+
+* 戻り値：ステージのステータス情報
+
+
+**************************/
+
+int Get_StageState(void)
+{
+	return Stage_State;
+}
+
+/************************
+
+*シーン制御機能:ミッション情報取得処理
+
+* 引数；なし
+
+* 戻り値：ミッションがクリアしているか
+
+
+**************************/
+
+int Get_StageClearFlag(void)
+{
+	return ClearFlag;
+}
+
+int Get_StageScore(void)
+{
+	return Stage_Score;
+}
+
+/************************
+
+*シーン制御機能:ミッション情報取得処理
+
+* 引数；次ミッションに必要な数値
+
+* 戻り値：なし
+
+
+**************************/
+
+
+void Set_StageMission(int mission)
+{
+	Stage_Mission += mission;
+}
+
+/************************
+
+*シーン制御機能:連鎖チェック処理
+
+* 引数１：　ブロックｙマス
+* 引数２：ブロックｘマス
+
+* 戻り値：連鎖有無　（０；なし　１；あり）
+
+
+**************************/
+
+int combo_check(int y, int x)
+{
+	int ret = FALSE;
+
+	//縦方向のチェック
+	int CountH = 0;
+
+	int ColorH = 0;
+
+	save_block();
+
+	combo_check_h(y, x, &CountH, &ColorH);
+
+
+	if (CountH < 3)
+	{
+		restore_block();  //３個未満なら戻す
+	}
+
+	//縦方向のチェック
+	int CountW = 0;
+	int ColorW = 0;
+	save_block();
+
+	combo_check_w(y, x, &CountW, &ColorW);
+	if (CountW < 3)
+	{
+		restore_block();
+	}
+	//3つ以上で並んでいるか？ 
+	if ((CountH >= 3 || CountW >= 3))
+	{
+		if (CountH >= 3)
+		{
+			Item[ColorH - 1] += CountH;
+			Stage_Score += CountH * 10;
+		}
+		if (CountW >= 3)
+		{
+			Item[ColorW - 1] += CountW;
+			Stage_Score += CountW * 10;
+		}
+		ret = TRUE;
+	}
+	return ret;
+}
+
+
+/************************
+
+*シーン制御機能:連鎖チェック処理(縦方向)
+
+* なし
+
+* 戻り値：連鎖有無　（０；なし　１；あり）
+
+
+**************************/
+
+void combo_check_h(int y, int x, int* cnt, int* col)
+{
+	int Color = 0;
+//対象のブロックが外枠の場合はreturnで処理を抜ける
+  if(Block[y][x].image == 0)
+	{
+	  return;
+	}
+
+  *col = Block[y][x].image;
+  Color = Block[y][x].image;
+  Block[y][x].image = 0;
+  (*cnt)++;
+
+  if (Block[y + 1][x].image == Color)
+  {
+	  combo_check_h(y + 1, x, cnt, col);
+  }
+  if (Block[y - 1][x].image == Color)
+  {
+	  combo_check_h(y - 1, x, cnt, col);
+  }
+}
+
+/************************
+
+*シーン制御機能:連鎖チェック処理
+
+* 引数１：　ブロックｙマス
+* 引数２：ブロックｘマス
+
+* 戻り値：連鎖有無　（０；なし　１；あり）
+
+
+**************************/
+
+void combo_check_w(int y, int x, int* cnt, int* col)
+{
+	int Color = 0;
+
+	//対象ブロックが枠外の場合returnで処理を抜ける
+	if (Block[y][x].image == 0)
+	{
+		return;
+	}
+	*col = Block[y][x].image;
+	Color = Block[y][x].image;
+	Block[y][x].image = 0;
+	(*cnt)++;
+
+	if (Block[y][x + 1].image == Color)
+	{
+		combo_check_w(y, x + 1, cnt, col);
+	}
+	if (Block[y][x - 1].image == Color)
+	{
+		combo_check_w(y, x - 1, cnt, col);
+	}
+}
+
+/************************
+
+*シーン制御機能:ブロック処理の保存処理
+
+* 引数：なし
+
+* 戻り値：なし
+
+**************************/
+
+void save_block(void)
+{
+	int i, j;
+	for (i=0;i<HEIGHT;i++)
+		{
+		for (j = 0; j < WIDTH; j++)
+		{
+			Block[i][j].backup = Block[i][j].image;
+		}
+	}
+}
+/************************
+
+*シーン制御機能:ブロック情報を戻す処理
+
+* 引数：なし
+
+* 戻り値：なし
+
+**************************/
+void restore_block(void)
+{
 	
+	 int i,j;
+	for(i = 0;i<HEIGHT;i++)
+	{
+		for (j = 0; j < HEIGHT; j++)
+		{
+			Block[i][j].image = Block[i][j].backup;
+		}
+	}
+}
+
 
 

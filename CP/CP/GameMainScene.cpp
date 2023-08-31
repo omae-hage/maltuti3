@@ -56,13 +56,13 @@ int NumberImage[NUMBER_IMAGE_MAX];  //数字用画像
 
 *****************/
 
-int GameMinScene_Initialize(void)
+int GameMainScene_Initialize(void)
 {
 	int ret = 0;
 	int i;
 
 	//画面読み込み
-	LoadDivGraph("images/unmber.png", NUMBER_IMAGE_MAX, NUMBER_IMAGE_MAX, 1, 60, 120, NumberImage);
+	LoadDivGraph("images/number.png", NUMBER_IMAGE_MAX, NUMBER_IMAGE_MAX, 1, 60, 120, NumberImage);
 	
 	//ステージ昨日初期化
 	ret = StageInitialize();
@@ -128,7 +128,7 @@ void GameMainScene_Update(void)
 
 	case 3:
 		CheckBlock();   //ブロックの確認
-
+		break;
 	case 4:
 		CheckClear();   //クリアチェック
 		break;
@@ -177,14 +177,14 @@ void GameMainScene_Draw(void)
 	{
 		FadeOutBlock();   //フェードアウトする。
 	}
+
 	//レベルを描画
 	do
 	{
 		DrawRotaGraph(PosX, 80, 0.5f, 0, NumberImage[tmp_levle % 10], TRUE);
 		tmp_levle /= 10;
 		PosX -= 30;
-	} 
-	while (tmp_levle > 0);
+	}while (tmp_levle > 0);
 
 	//スコアの描画
 	PosX = 620;
@@ -194,8 +194,7 @@ void GameMainScene_Draw(void)
 		
 		tmp_score /= 10;
 		PosX -= 20;
-	}
-	while (tmp_score > 0);
+	}while (tmp_score > 0);
 
 	//制限時間の描画
 	DrawBox(491, 469, 509, 469 - GameTime / 60 * 2,0x0033ff, TRUE);

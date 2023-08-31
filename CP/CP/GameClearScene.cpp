@@ -82,7 +82,7 @@ void GameClearScene_Update(void)
 	{
 		if (GameClearFlag == TRUE)
 		{
-			Change_Scene(E_GAME_MAIN);
+			Change_Scene(E_GAMEMAIN);
 		}
 		else
 		{
